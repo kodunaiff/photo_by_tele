@@ -4,11 +4,10 @@ import os
 import requests
 from dotenv import load_dotenv
 
-from space_x_im import get_file_extension
+from get_file_extension_image import get_file_extension, save_image
 
 
-def fetch_nasa_apod(count_image):
-    token = os.getenv('token')
+def fetch_nasa_apod(count_image, token):
     url = 'https://api.nasa.gov/planetary/apod'
 
     payload = {
@@ -18,22 +17,24 @@ def fetch_nasa_apod(count_image):
     response = requests.get(url, params=payload)
     response.raise_for_status()
 
-    nasa_pic = response.json()
-    for link_number, link in enumerate(nasa_pic):
-        response = requests.get(link['url'])
-        response.raise_for_status()
+    nasa_pictures = response.json()
+    for link_number, link in enumerate(nasa_pictures):
         form = get_file_extension(link['url'])
-        save_path = os.path.join('images', 'nasa_apod'
-                                 + str(link_number + 1) + str(form))
-        with open(save_path, 'wb') as file:
-            file.write(response.content)
+        save_path = os.path.join('images', f'nasa_apod{link_number + 1}{form}')
+        save_image(save_path, link['url'])
 
 
-load_dotenv()
-parser = argparse.ArgumentParser(
-    description='Получает количество картинок'
-)
-parser.add_argument('count_image', help='give me count')
-args = parser.parse_args()
+def main():
+    load_dotenv()
+    token = os.getenv('TOKEN_NASA')
+    parser = argparse.ArgumentParser(
+        description='Скачивает популярные изображения космоса'
+    )
+    parser.add_argument('count_image', help='give me count')
+    args = parser.parse_args()
 
-fetch_nasa_apod(args.count_image)
+    fetch_nasa_apod(args.count_image, token)
+
+
+if __name__ == "__main__":
+    main()

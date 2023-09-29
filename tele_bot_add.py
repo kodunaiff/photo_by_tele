@@ -7,39 +7,40 @@ import telegram
 from dotenv import load_dotenv
 
 
-def published_picture(delay):
+def post_images(delay):
     while True:
         random.shuffle(files_in_dir)
-        for file_pic in files_in_dir:
+        for picture in files_in_dir:
             time.sleep(int(delay))
-            bot.send_document(chat_id=chat_id,
-                              document=open('images/' + f'{file_pic}', 'rb'))
+            with open(f'images/{picture}', 'rb') as picture:
+                bot.send_document(chat_id=chat_id, document=picture)
 
 
-load_dotenv()
-token = os.getenv('token_tele')
-
-bot = telegram.Bot(token=token)
-updates = bot.get_updates()
-chat_id = '@space_pictures03'
-path_picture = 'images/'
-files_in_dir = os.listdir(path_picture)
-
-
-def get_delay():
+def get_delay(delay_time):
     parser = argparse.ArgumentParser(
-        description='Получает частоту публикаций'
+        description='Публикует фотографии в ТГ'
     )
     parser.add_argument(
         '-t',
         '--delay_time',
         help='give me time_delay',
         type=int,
-        default=int(os.getenv('DELAY_TIME', 14400))
+        default=delay_time
     )
     args = parser.parse_args()
     return args.delay_time
 
 
-delay = get_delay()
-published_picture(delay)
+if __name__ == "__main__":
+    load_dotenv()
+    token = os.getenv('TELEGRAM_TOKEN')
+    delay_time = os.getenv('DELAY_TIME')
+    chat_id = os.getenv('TG_CHAT_ID')
+
+    bot = telegram.Bot(token=token)
+    updates = bot.get_updates()
+    path_picture = 'images/'
+    files_in_dir = os.listdir(path_picture)
+
+    delay = get_delay(delay_time)
+    post_images(delay)

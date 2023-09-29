@@ -2,20 +2,30 @@ import os
 
 import requests
 
-url_ex = 'https://api.nasa.gov/EPIC/api/natural/images?api_key=DEMO_KEY'
+from get_file_extension_image import save_image
 
-response = requests.get(url_ex)
-response.raise_for_status()
-earth_db = response.json()
-for epic_number, epic_e in enumerate(earth_db):
-    date_e, time_e = epic_e['date'].split()
-    year, month, day = date_e.split('-')
-    name_image = epic_e['image'] + '.png'
-    save_path = os.path.join('images', 'earth_pic'
-                             + str(epic_number + 1) + '.png')
-    url = f'https://api.nasa.gov/EPIC/archive/natural/{year}/{month}/{day}/' \
-          f'png/{name_image}?api_key=DEMO_KEY'
-    response = requests.get(url)
+
+def main():
+    params = {
+        'api_key': 'DEMO_KEY'
+    }
+    url_ex = 'https://api.nasa.gov/EPIC/api/natural/images'
+
+    response = requests.get(url_ex, params=params)
     response.raise_for_status()
-    with open(save_path, 'wb') as file:
-        file.write(response.content)
+    epic_data = response.json()
+    for epic_number, epic_record in enumerate(epic_data):
+        date_image, time_image = epic_record['date'].split()
+        year, month, day = date_image.split('-')
+        name_image = epic_record['image']
+        save_path = os.path.join('images', f'earth_picture{epic_number + 1}.png')
+        url = f'https://api.nasa.gov/EPIC/archive/natural/{year}/{month}' \
+              f'/{day}/'f'png/{name_image}.png'
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        image_url = response.url
+        save_image(save_path, image_url)
+
+
+if __name__ == "__main__":
+    main()
