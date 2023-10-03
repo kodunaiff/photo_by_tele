@@ -7,7 +7,7 @@ import telegram
 from dotenv import load_dotenv
 
 
-def post_images(delay):
+def post_images(delay, chat_id, files_in_dir, bot):
     while True:
         random.shuffle(files_in_dir)
         for picture in files_in_dir:
@@ -31,16 +31,17 @@ def get_delay(delay_time):
     return args.delay_time
 
 
-if __name__ == "__main__":
+def main():
     load_dotenv()
     token = os.getenv('TELEGRAM_TOKEN')
+    bot = telegram.Bot(token=token)
     delay_time = os.getenv('DELAY_TIME')
     chat_id = os.getenv('TG_CHAT_ID')
-
-    bot = telegram.Bot(token=token)
-    updates = bot.get_updates()
     path_picture = 'images/'
     files_in_dir = os.listdir(path_picture)
-
     delay = get_delay(delay_time)
-    post_images(delay)
+    post_images(delay, chat_id, files_in_dir, bot)
+
+
+if __name__ == "__main__":
+    main()
