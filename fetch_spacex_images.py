@@ -10,8 +10,8 @@ def fetch_spacex_last_launch(id):
     response = requests.get(url)
     response.raise_for_status()
     flickr_links = response.json()['links']['flickr']['original']
-    for link_number, link in enumerate(flickr_links):
-        save_path = os.path.join('images', f'space{link_number + 1}.jpg')
+    for link_number, link in enumerate(flickr_links, start=1):
+        save_path = os.path.join('images', f'space{link_number}.jpg')
         save_image(save_path, link)
 
 
