@@ -10,15 +10,12 @@ def get_file_extension(url):
     filename, file_extension = os.path.splitext(url)
     return file_extension
 
-def save_image(save_path, link):
-    response = requests.get(link)
+
+def save_image(save_path, link, api_key=None):
+    params = {
+        'api_key': api_key
+    }
+    response = requests.get(link, params=params)
     response.raise_for_status()
     with open(save_path, 'wb') as file:
         file.write(response.content)
-
-def main():
-    url = "https://example.com/txt/hello%20world.txt?v=9#python"
-
-
-if __name__ == "__main__":
-    main()
